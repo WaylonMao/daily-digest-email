@@ -1,5 +1,7 @@
 import requests
 import random
+
+import tweepy
 from dotenv import load_dotenv
 import os
 import json
@@ -9,6 +11,11 @@ from urllib import request
 load_dotenv()
 
 WEATHER_API = os.getenv("WEATHER_API")
+TWITTER_BEARER = os.getenv("TWITTER_BEARER")
+TWITTER_CONSUMER_KEY = os.getenv("TWITTER_CONSUMER_KEY")
+TWITTER_CONSUMER_SECRET = os.getenv("TWITTER_CONSUMER_SECRET")
+TWITTER_ACCESS_KEY = os.getenv("TWITTER_ACCESS_KEY")
+TWITTER_ACCESS_SECRET = os.getenv("TWITTER_ACCESS_SECRET")
 
 
 # Retrieve a random quote from https://randomwordgenerator.com/motivational-quote.php
@@ -43,10 +50,8 @@ def get_random_quote():
 
 
 def get_weather_forecast(coords={'lat': 51.0460243, 'lon': -114.0756112}):
-    print(WEATHER_API)
     try:
         url = f"https://api.openweathermap.org/data/2.5/forecast?lat={coords['lat']}&lon={coords['lon']}&appid={WEATHER_API}"
-        print(url)
         data = json.load(request.urlopen(url))
 
         forecast = {
@@ -65,8 +70,14 @@ def get_weather_forecast(coords={'lat': 51.0460243, 'lon': -114.0756112}):
         return None
 
 
-def get_twitter_trends():
-    pass
+def get_twitter_trends(woeid=8775):
+    try:
+        auth = tweepy.OAuthHandler(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET)
+        tweets = tweepy.API(auth).get_place_trends(woeid)[0]["trends"]
+        return tweets
+    except Exception as e:
+        print(e)
+        return None
 
 
 def get_wikipedia_article():
@@ -74,5 +85,6 @@ def get_wikipedia_article():
 
 
 if __name__ == '__main__':
-    print(get_random_quote())
-    print(get_weather_forecast())
+    # print(get_random_quote())
+    # print(get_weather_forecast())
+    print(get_twitter_trends())
