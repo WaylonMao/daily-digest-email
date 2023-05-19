@@ -61,7 +61,7 @@ def get_weather_forecast(coords={'lat': 51.0460243, 'lon': -114.0756112}):
 
         for period in data["list"][0:9]:
             forecast["periods"].append({"timestamp": datetime.datetime.fromtimestamp(period["dt"]),
-                                        "temp": round(period["main"]["temp"]),
+                                        "temp": round(period["main"]["temp"]-273.15),
                                         "description": period["weather"][0]["description"].title(),
                                         "icon": f"http://openweathermap.org/img/wn/{period['weather'][0]['icon']}.png"})
         return forecast
