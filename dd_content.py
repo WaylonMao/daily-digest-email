@@ -81,10 +81,22 @@ def get_twitter_trends(woeid=8775):
 
 
 def get_wikipedia_article():
-    pass
+    try:
+        url = "https://en.wikipedia.org/api/rest_v1/page/random/summary"
+        data = json.load(request.urlopen(url))
+        article = {
+            "title": data["title"],
+            "extract": data["extract"],
+            "link": data["content_urls"]["desktop"]["page"]
+        }
+        return article
+    except Exception as e:
+        print(e)
+        return None
 
 
 if __name__ == '__main__':
     # print(get_random_quote())
     # print(get_weather_forecast())
-    print(get_twitter_trends())
+    # print(get_twitter_trends())
+    print(get_wikipedia_article())
