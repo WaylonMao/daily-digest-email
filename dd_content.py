@@ -87,8 +87,7 @@ def get_wikipedia_article():
         article = {
             "title": data["title"],
             "extract": data["extract"],
-            "link": data["content_urls"]["desktop"]["page"]
-        }
+            "url": data["content_urls"]["desktop"]["page"]}
         return article
     except Exception as e:
         print(e)
