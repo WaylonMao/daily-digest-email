@@ -1,5 +1,12 @@
 import dd_content
 import datetime
+import dotenv
+import os
+import smtplib
+from email.message import EmailMessage
+
+SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+SENDER_EMAIL_PASSWORD = os.getenv("SENDER_EMAIL_PASSWORD")
 
 
 class DailyDigestEmail:
@@ -9,9 +16,29 @@ class DailyDigestEmail:
                         "weather": {"include": True, "content": dd_content.get_weather_forecast()},
                         "twitter": {"include": True, "content": dd_content.get_twitter_trends()},
                         "wikipedia": {"include": True, "content": dd_content.get_wikipedia_article()}}
+        self.recipients_list = ["weilong.mao@gmail.com",
+                                "weilong.mao+test@gmail.com"]
+
+        self.sender_credentials = {"email": SENDER_EMAIL,  # your sender email address
+                                   "password": SENDER_EMAIL_PASSWORD}  # your sender password
 
     def send_email(self):
-        pass
+        msg = EmailMessage()
+        msg["Subject"] = f'Daily Digest - {datetime.date.today().strftime("%d %b %Y")}'
+        msg["From"] = self.sender_credentials["email"]
+        msg["To"] = ", ".join(self.recipients_list)
+
+        # add Plaintext and HTML content
+        msg_body = self.format_message()
+        msg.set_content(msg_body["text"])
+        msg.add_alternative(msg_body["html"], subtype="html")
+
+        # secure connection with STMP server and send email
+        with smtplib.SMTP("smtp.office365.com", 587) as server:
+            server.starttls()
+            server.login(self.sender_credentials["email"],
+                         self.sender_credentials["password"])
+            server.send_message(msg)
 
     """
     Generate email message body as Plaintext and HTML.
@@ -121,23 +148,27 @@ class DailyDigestEmail:
 
         return {"text": text, "html": html}
 
-
+#
 if __name__ == "__main__":
     email = DailyDigestEmail()
 
-    ##### test format_message() #####
+    # test format_message()
     print("\nTesting email body generation...")
     message = email.format_message()
 
     # print Plaintext and HTML messages
     print("\nPlaintext email body is...")
-    print(message["text"])
+    print(message['text'])
     print("\n------------------------------------------------------------")
     print("\nHTML email body is...")
-    print(message["html"])
+    print(message['html'])
 
     # save Plaintext and HTML messages to file
     with open("message_text.txt", "w", encoding="utf-8") as f:
         f.write(message["text"])
     with open("message_html.html", "w", encoding="utf-8") as f:
-        f.write(message["html"])
+        f.write(message['html'])
+
+    # test send_email()
+    print("\nSending test email...")
+    email.send_email()
