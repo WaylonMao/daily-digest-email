@@ -32,3 +32,6 @@ env_bak/
 
 # Windows
 Thumbs.db
+
+# dotenv
+.env
